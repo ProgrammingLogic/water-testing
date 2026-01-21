@@ -6,11 +6,14 @@ class_name Water
 
 var points: PackedVector2Array
 var line: Line2D = Line2D.new()
-var stopped = false
+var line_width = 16
 var collision_layers = 1
+var margin = 4
+var direction = -1 # Left 
 
 
-func _process(delta: float) -> void:
+
+func _physics_process(delta: float)-> void:
 	update_water_line()
 	draw_water_line()
 
@@ -20,15 +23,62 @@ func draw_water_line() -> void:
 		add_child(line)
 
 	line.default_color = Color.BLUE
-	line.width = 10
+	line.width = line_width
 	line.points = points
 
 
 func update_water_line() -> void:
-	stopped = false
+	var flowing = true
 	points = [start_point.position]
 	
-	add_point_below()
+	while flowing:
+		if can_flow_down():
+			add_point_below()
+		elif can_flow_horizontal():
+			add_point_horizontal()
+
+		flowing = not is_done_flowing()
+
+
+func can_flow_down() -> bool:
+	var result = false
+	
+	var point := Vector2i(
+		points[-1].x,
+		points[-1].y + line_width * 2,
+	)
+	
+	if get_collisions(point):
+		return false
+
+	return true
+
+
+func can_flow_horizontal() -> bool:
+	var result = false
+	
+	var x = points[-1].x + ((line_width * 2) * direction)
+	var point := Vector2i(
+		x,
+		points[-1].y,
+	)
+	
+	if get_collisions(point):
+		return false
+
+	return true
+
+
+func is_done_flowing() -> bool:
+	if is_at_bottom():
+		return true
+
+	return false
+
+
+func is_at_bottom() -> bool:
+	var screen_height = get_viewport_rect().size.y
+	return points[-1].y == screen_height
 
 
 func add_point_below() -> void:
@@ -37,8 +87,36 @@ func add_point_below() -> void:
 	if not collision:
 		points.append(get_bottom_point())
 		return
-		
-	points.append(collision["position"])
+	
+	var point := Vector2(
+		collision["position"].x,
+		collision["position"].y - margin,
+	)
+
+	points.append(point)
+
+
+func add_point_horizontal():
+	var increment = ((line_width * 2) * direction)
+	var point = Vector2(
+		points[-1].x + increment,
+		points[-1].y,
+	)
+	
+	# TODO
+	# - Add logic to find where we STOP being unable to move down
+	var collision = get_collisions(point)
+	if not collision: 
+		points.append(point)
+		return
+
+	point = Vector2(
+		collision["position"].x - (margin * direction),
+		collision["position"].y,
+	)
+
+	points.append(point)
+	
 
 
 func get_collisions_below() -> Dictionary:
