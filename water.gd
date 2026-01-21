@@ -2,8 +2,7 @@ extends Node2D
 class_name Water
 
 
-@export var start_point: Node2D
-
+var start_point: Vector2
 var points: PackedVector2Array
 var line: Line2D = Line2D.new()
 var line_width = 16
@@ -11,6 +10,10 @@ var collision_layers = 1
 var margin = 8
 var direction = -1 # Left 
 
+
+func _init(s_point: Vector2, dir: int = -1) -> void:
+	start_point = s_point
+	direction = dir
 
 func _physics_process(delta: float)-> void:
 	update_water_line()
@@ -28,16 +31,22 @@ func draw_water_line() -> void:
 
 func update_water_line() -> void:
 	var flowing = true
-	points = [start_point.position]
+	points = [start_point]
 	
 	while flowing:
 		if can_flow_down():
 			add_point_below()
 		elif can_flow_horizontal():
+			split_water()
 			add_point_horizontal()
 			
 
 		flowing = not is_done_flowing()
+
+
+func split_water() -> void:
+	var w: Water = Water.new(points[-1], direction * -1)
+	get_parent().add_child(w)
 
 
 func can_flow_down() -> bool:
@@ -110,7 +119,7 @@ func add_point_horizontal():
 	)
 	
 	# TODO
-	# - Add logic to find where we STOP being unable to move down
+	# - If laggy, add logic to find where we STOP being unable to move down
 	var collision = get_collisions(point)
 	if not collision: 
 		points.append(point)
