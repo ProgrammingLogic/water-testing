@@ -5,19 +5,24 @@ class_name Water
 @export var start_point: Node2D
 
 var points: PackedVector2Array
+var line: Line2D = Line2D.new()
 
 
 func _ready() -> void:
 	update_water_line()
-	var line = Line2D.new()
+	draw_water_line()
+
+
+func draw_water_line() -> void:
+	if not line.get_parent():
+		add_child(line)
+
 	line.default_color = Color.BLUE
 	line.width = 10
 	line.points = points
-	add_child(line)
-	
 
 
-func update_water_line():
+func update_water_line() -> void:
 	points = [start_point.position]
 	
 	if not get_collisions_below():
