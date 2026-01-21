@@ -8,9 +8,8 @@ var points: PackedVector2Array
 var line: Line2D = Line2D.new()
 var line_width = 16
 var collision_layers = 1
-var margin = 4
+var margin = 8
 var direction = -1 # Left 
-
 
 
 func _physics_process(delta: float)-> void:
@@ -36,6 +35,7 @@ func update_water_line() -> void:
 			add_point_below()
 		elif can_flow_horizontal():
 			add_point_horizontal()
+			
 
 		flowing = not is_done_flowing()
 
@@ -72,8 +72,14 @@ func can_flow_horizontal() -> bool:
 func is_done_flowing() -> bool:
 	if is_at_bottom():
 		return true
+	if is_outside_viewport():
+		return true
 
 	return false
+
+
+func is_outside_viewport() -> bool:
+	return not get_viewport_rect().has_point(points[-1])
 
 
 func is_at_bottom() -> bool:
@@ -112,7 +118,7 @@ func add_point_horizontal():
 
 	point = Vector2(
 		collision["position"].x - (margin * direction),
-		collision["position"].y,
+		collision["position"].y - margin,
 	)
 
 	points.append(point)
