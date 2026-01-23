@@ -73,9 +73,46 @@ func can_flow_down() -> bool:
 func can_flow_horizontal() -> bool:
 	var result = false
 	
-	var last_point = get_point_position(-1)
+	print("water.position: (%d, %d)" % [water.position.x, water.position.y])
+	
+	for i in points.size() - 1:
+		var point: Vector2 = points[i]
+		print("\tpoint %d position: (%d, %d)" % [i, point.x, point.y])
+
+	for i in points.size() - 1:
+		var point: Vector2 = points[i] + water.position
+		print("\tpoint %d position + water.position: (%d, %d)" % [i, point.x, point.y])
+	
+	var last_point = points[-1]
 	var x_offset = last_point.x + (width * direction)
 	var new_point = Vector2(x_offset, last_point.y)
+	
+	print("last point, not transformed:")
+	Game.debug_draw_line(last_point, new_point, 5.0, Color.BEIGE)
+	print("\tlast_point: (%d, %d)" % [last_point.x, last_point.y])
+	print("\tx_offset: %d" % [x_offset])
+	print("\tnew_point: (%d, %d)" % [new_point.x, new_point.y])
+	
+	var last_point_water_offset = points[-1] + water.position
+	var x_offset_water_offset = last_point_water_offset.x + (width * direction)
+	var new_point_water_offset = Vector2(x_offset_water_offset, last_point_water_offset.y)
+	print("last point, transformed:")
+	Game.debug_draw_line(last_point_water_offset, new_point_water_offset, 7.0, Color.BLACK)
+	print("\tlast_point: (%d, %d)" % [last_point_water_offset.x, last_point_water_offset.y])
+	print("\tx_offset: %d" % [x_offset_water_offset])
+	print("\tnew_point_water_offset: (%d, %d)" % [new_point_water_offset.x, new_point_water_offset.y])
+	
+	#var t_last_point = points[-1] * global_transform * -1
+	#var t_x_offset = last_point.x + (width * direction)
+	#var t_new_point = Vector2(t_x_offset, t_last_point.y)
+	#
+	#Game.debug_draw_line(t_last_point, t_new_point, 10.0, Color.GREEN)
+	#
+	#print("global transform: (%d, %d)" % [global_transform.x, global_transform.y])
+	#print("t_last_point: (%d, %d)" % [t_last_point.x, t_last_point.y])
+	#print("t_x_offset: %d" % [t_x_offset])
+	#print("t_new_point: (%d, %d)" % [t_new_point.x, t_new_point.y])
+
 	
 	if get_collisions(new_point):
 		return false
