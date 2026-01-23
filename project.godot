@@ -14,3 +14,7 @@ config/name="Water Testing"
 run/main_scene="uid://dofw6i7btyoqp"
 config/features=PackedStringArray("4.5", "Forward Plus")
 config/icon="res://icon.svg"
+
+[autoload]
+
+Game="*res://game.gd"
