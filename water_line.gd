@@ -39,8 +39,8 @@ func calculate_points():
 		if can_flow_down():
 			add_point_below()
 
-		#elif can_flow_horizontal():
-			#add_left_point()
+		elif can_flow_horizontal():
+			add_left_point()
 			#add_right_point()
 
 		else:
@@ -73,13 +73,11 @@ func can_flow_down() -> bool:
 func can_flow_horizontal() -> bool:
 	var result = false
 	
-	var x = points[-1].x + ((width * 2) * direction)
-	var point := Vector2i(
-		x,
-		points[-1].y,
-	)
+	var last_point = get_point_position(-1)
+	var x_offset = last_point.x + (width * direction)
+	var new_point = Vector2(x_offset, last_point.y)
 	
-	if get_collisions(point):
+	if get_collisions(new_point):
 		return false
 
 	return true
