@@ -13,7 +13,7 @@ func _ready() -> void:
 	
 	update_timer.timeout.connect(update)
 	add_child(update_timer)
-	update_timer.start(0.1)
+	update_timer.start(5)
 
 
 func update() -> void:
