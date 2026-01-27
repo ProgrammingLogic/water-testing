@@ -39,14 +39,78 @@ func calculate_points():
 		if can_flow_down():
 			add_point_below()
 
-		elif can_flow_horizontal():
-			add_left_point()
+		#elif can_flow_horizontal():
+			#add_left_point()
+			#break
 			#add_right_point()
 
 		else:
 			break
 
+#region Translations -> Methods to translate the WaterLine's points.
+## Get the point's position translated to the center of the tile map
+## 
+## Input:
+## - point: Vector2 -> The global position of the point to translate.
+##
+## Output
+## - translated_point: Vector2 -> The point centered on it's position in the 
+##	tile map
+func translate_to_cell_center(point: Vector2) -> Vector2:
+	var tile_map = Game.tile_map
+	var tile_size = tile_map.tile_set.size
 
+	var cell_cordinates = floor(point / tile_size)
+	var cell_position = cell_cordinates * tile_size
+	
+	var translated_point = cell_position + tile_size / 2
+	
+	return translated_point
+
+
+## Translate the point to it's global position. 
+##
+## Input:
+## - point: Vector2 -> The point to translate to it's global position.
+##
+## Ouput:
+## - translated_point: Vector2 -> The point trnaslated to it's global position
+func translate_to_global_point(point: Vector2) -> Vector2:
+	return point + water.position
+
+
+## Translate an array of points to their global position. 
+##
+## Input:
+## - points: PackedVector2Array -> A list of points to translate to their
+##	global position. 
+## 
+## Output:
+## - translated_points: PackedVector2Array -> The list of points translated to their
+##	global positions.
+func translate_to_global_points(_points: PackedVector2Array) -> PackedVector2Array:
+	var translated_points: PackedVector2Array = []
+	var water_pos: Vector2 = water.position
+
+	for point in _points:
+		translated_points.append(point + water_pos)
+
+	return translated_points
+
+
+## Translate the point to it's local position. 
+##
+## Input:
+## - point: Vector2 -> The point to translate to it's local position.
+##
+## Ouput:
+## - translated_point: Vector2 -> The point translated to it's local position
+func translate_to_local_point(point: Vector2) -> Vector2:
+	return point - water.position
+#endregion
+
+
+#region Checks for the waterline.
 func is_at_bottom() -> bool:
 	var screen_height = get_viewport_rect().size.y
 	return points[-1].y == screen_height
@@ -57,12 +121,27 @@ func is_outside_viewport() -> bool:
 
 
 func can_flow_down() -> bool:
+	#print("points")
+	#print("\twater.position: %.0v" % water.position)
+	#
+	#print("\tpoints not transformed")
+	#for point in points:
+		#print("\t\t%v" % point)
+#
+	#print("\tpoints transformed by water.position")
+	#for point in translate_to_global_points():
+		#print("\t\t%v" % point)
+
 	var result = false
 	
 	var point := Vector2i(
 		points[-1].x,
 		points[-1].y + width * 2,
 	)
+	
+	#print("\tnew_point: %v" % point)
+	#print("\tnew_point_global: %v" % translate_to_global_point(point))
+	#Game.debug_draw_line(translate_to_global_point(points[0]), translate_to_global_point(point), 10, Color.YELLOW)
 	
 	if get_collisions(point):
 		return false
@@ -72,54 +151,35 @@ func can_flow_down() -> bool:
 
 func can_flow_horizontal() -> bool:
 	var result = false
+	print("points")
+	print("\twater.position: %.0v" % water.position)
 	
-	print("water.position: (%d, %d)" % [water.position.x, water.position.y])
-	
-	for i in points.size() - 1:
-		var point: Vector2 = points[i]
-		print("\tpoint %d position: (%d, %d)" % [i, point.x, point.y])
+	print("\tpoints not transformed")
+	for point in points:
+		print("\t\t%v" % point)
 
-	for i in points.size() - 1:
-		var point: Vector2 = points[i] + water.position
-		print("\tpoint %d position + water.position: (%d, %d)" % [i, point.x, point.y])
+	print("\tpoints transformed by water.position")
+	for point in translate_to_global_points(points):
+		print("\t\t%v" % point)
 	
 	var last_point = points[-1]
-	var x_offset = last_point.x + (width * direction)
-	var new_point = Vector2(x_offset, last_point.y)
-	
-	print("last point, not transformed:")
-	Game.debug_draw_line(last_point, new_point, 5.0, Color.BEIGE)
-	print("\tlast_point: (%d, %d)" % [last_point.x, last_point.y])
-	print("\tx_offset: %d" % [x_offset])
-	print("\tnew_point: (%d, %d)" % [new_point.x, new_point.y])
-	
-	var last_point_water_offset = points[-1] + water.position
-	var x_offset_water_offset = last_point_water_offset.x + (width * direction)
-	var new_point_water_offset = Vector2(x_offset_water_offset, last_point_water_offset.y)
-	print("last point, transformed:")
-	Game.debug_draw_line(last_point_water_offset, new_point_water_offset, 7.0, Color.BLACK)
-	print("\tlast_point: (%d, %d)" % [last_point_water_offset.x, last_point_water_offset.y])
-	print("\tx_offset: %d" % [x_offset_water_offset])
-	print("\tnew_point_water_offset: (%d, %d)" % [new_point_water_offset.x, new_point_water_offset.y])
-	
-	#var t_last_point = points[-1] * global_transform * -1
-	#var t_x_offset = last_point.x + (width * direction)
-	#var t_new_point = Vector2(t_x_offset, t_last_point.y)
-	#
-	#Game.debug_draw_line(t_last_point, t_new_point, 10.0, Color.GREEN)
-	#
-	#print("global transform: (%d, %d)" % [global_transform.x, global_transform.y])
-	#print("t_last_point: (%d, %d)" % [t_last_point.x, t_last_point.y])
-	#print("t_x_offset: %d" % [t_x_offset])
-	#print("t_new_point: (%d, %d)" % [t_new_point.x, t_new_point.y])
+	var x_offset = last_point.x - 8
+	var new_point = Vector2(last_point.x + x_offset, last_point.y)
+	Game.debug_draw_line(translate_to_global_point(last_point), translate_to_global_point(new_point), 5.0, Color.YELLOW)
+	print("\tlast point, not transformed:")
+	print("\t\tlast_point: %v" % last_point)
+	print("\t\tx_offset: %d" % x_offset)
+	print("\t\tnew_point: %v" % new_point)
 
 	
 	if get_collisions(new_point):
 		return false
 
 	return true
+#endregion
 
 
+#region Add points to the water line.
 func add_left_point():
 	var current_point = points[-1]
 	# Don't return Vector2 until we find a point we can go down at, 
@@ -137,6 +197,7 @@ func add_left_point():
 		))
 	
 	add_point(left_point)
+
 
 func add_right_point():
 	var current_point = points[-1]
@@ -157,18 +218,16 @@ func add_right_point():
 
 
 func add_point_below() -> void:
-	var collision = get_collisions_below()
+	var collision: Vector2 = get_collisions_below()
 	
 	if not collision:
+		print("nothing below")
 		add_point(get_bottom_point())
 		return
 	
-	var point := Vector2(
-		collision["position"].x,
-		collision["position"].y - margin,
-	)
+	print("something below")
 	
-	add_point(point)
+	add_point(collision)
 
 
 func add_point_horizontal():
@@ -185,14 +244,13 @@ func add_point_horizontal():
 		points.append(point)
 		return
 
-	point = Vector2(
-		collision["position"].x - (margin * direction),
-		collision["position"].y - margin,
-	)
+	point = collision
 
 	add_point(point)
+#endregion
 
 
+#region Get Points -> Methods to get certain important points on the WaterLine.
 func get_bottom_point() -> Vector2:
 	var screen_height = get_viewport_rect().size.y
 	return Vector2(points[-1].x, screen_height)
@@ -244,21 +302,33 @@ func get_right_point() -> Vector2:
 	return Vector2.ZERO
 
 
-func get_collisions(point: Vector2) -> Dictionary:
-	var result = {}
-	
+func get_collisions(point: Vector2) -> Vector2:
+	Game.debug_draw_line(translate_to_global_point(points[-1]), translate_to_global_point(point), 2, Color.YELLOW)
+
+	#var query = PhysicsRayQueryParameters2D.create(
+		#points[-1], 
+		#point,
+		#collision_layers,
+	#)
 	var space_state = get_world_2d().direct_space_state
 	var query = PhysicsRayQueryParameters2D.create(
-		points[-1], 
-		point,
+		translate_to_global_point(points[-1]), 
+		translate_to_global_point(point),
 		collision_layers,
 	)
+	var collision = space_state.intersect_ray(query)
 	
-	result = space_state.intersect_ray(query)
-	return result
+	if collision.is_empty():
+		return Vector2.ZERO
+
+	Game.debug_draw_line(translate_to_global_point(points[-1]), translate_to_global_point(point), 5, Color.RED)
+
+	var global_collision_point = collision["position"]
+	var local_collision_point = translate_to_local_point(global_collision_point)
+	return local_collision_point
 
 
-func get_collisions_below() -> Dictionary:
+func get_collisions_below() -> Vector2:
 	var result = {}
 
 	var screen_height = get_viewport_rect().size.y
@@ -266,3 +336,4 @@ func get_collisions_below() -> Dictionary:
 	result = get_collisions(bottom_point)
 	
 	return result
+#endregion
