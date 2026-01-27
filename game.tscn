@@ -64,7 +64,10 @@ tile_map_data = PackedByteArray("AAAJAAMAAQAAAAAAAAAJAAQAAQAAAAAAAAAJAAUAAQAAAAA
 tile_set = SubResource("TileSet_boyg6")
 script = ExtResource("8_vef74")
 
-[node name="Water" type="Node2D" parent="."]
-position = Vector2(384, 56)
+[node name="Water" type="Node2D" parent="." node_paths=PackedStringArray("starting_point")]
 script = ExtResource("8_j5wjh")
+starting_point = NodePath("Starting point")
 metadata/_custom_type_script = "uid://dpk5xw5nnw43o"
+
+[node name="Starting point" type="Node2D" parent="Water"]
+position = Vector2(400, 48)
