@@ -1,15 +1,19 @@
 extends Node2D
 class_name Water
-
+## Water class
+##
+## NOTE: You MUST place Water at (0, 0) of the tile map layer.
 
 const LINE_WIDTH = 8
 
 var water_lines: Array[WaterLine] = []
 var update_timer := Timer.new()
 
+@export var starting_point: Node2D
+
 
 func _ready() -> void:
-	add_water_line([position], -1)
+	add_water_line([starting_point.position], -1)
 	
 	update_timer.timeout.connect(update)
 	add_child(update_timer)
@@ -18,7 +22,7 @@ func _ready() -> void:
 
 func update() -> void:
 	clear_water()
-	add_water_line([position], -1)
+	add_water_line([starting_point.position], -1)
 
 
 func clear_water() -> void:

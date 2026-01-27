@@ -13,6 +13,8 @@ var static_body := StaticBody2D.new()
 var segments: Array[SegmentShape2D] = []
 
 
+
+
 func _init(w: Water, s_points: PackedVector2Array, dir: int = -1) -> void:
 	water = w
 	starting_points = s_points
@@ -27,7 +29,9 @@ func _ready() -> void:
 
 
 func calculate_points():
-	points = [starting_points]
+	set_points(starting_points)
+	#add_point()
+	#points = [starting_points]
 
 	while true:
 		if is_at_bottom():
