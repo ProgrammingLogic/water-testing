@@ -1,9 +1,17 @@
 extends Node2D
 
 
+var tile_map: TileMapLayer
+
+
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
 	pass
+
+
+func _input(event: InputEvent) -> void:
+	if event.is_action_released("mouse_click"):
+		get_viewport().get_global_mouse_position()
 
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
