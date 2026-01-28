@@ -13,11 +13,9 @@ var update_timer := Timer.new()
 
 
 func _ready() -> void:
-	add_water_line([starting_point.position], -1)
-	
 	update_timer.timeout.connect(update)
 	add_child(update_timer)
-	update_timer.start(5)
+	update_timer.start(2)
 
 
 func update() -> void:
