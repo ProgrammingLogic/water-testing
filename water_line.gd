@@ -37,7 +37,7 @@ func calculate_points():
 		if is_at_bottom():
 			break
 
-		if is_outside_viewport():
+		if is_outside_viewport(points[-1]):
 			break
 
 		if can_flow_down():
@@ -50,6 +50,19 @@ func calculate_points():
 
 		else:
 			break
+
+
+## Add a point to the water line.
+##
+## Input:
+## - point: Vector2 -> The global position of the point to add to the water
+##	line.
+func add_water_point(point: Vector2) -> void:
+	assert(not point == Vector2.ZERO)
+	assert(not is_outside_viewport(point))
+	var centered_point = translate_to_cell_center(point)
+	add_point(centered_point)
+
 
 #region Translations -> Methods to translate the WaterLine's points.
 ## Get the point's position translated to the center of the tile map
@@ -120,8 +133,8 @@ func is_at_bottom() -> bool:
 	return points[-1].y == screen_height
 
 
-func is_outside_viewport() -> bool:
-	return not get_viewport_rect().has_point(points[-1])
+func is_outside_viewport(point: Vector2) -> bool:
+	return not get_viewport_rect().has_point(point)
 
 
 func can_flow_down() -> bool:
@@ -200,7 +213,7 @@ func add_left_point():
 			direction * -1,
 		))
 	
-	add_point(left_point)
+	add_water_point(left_point)
 
 
 func add_right_point():
