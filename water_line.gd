@@ -12,16 +12,19 @@ var shape := CollisionShape2D.new()
 var static_body := StaticBody2D.new()
 var segments: Array[SegmentShape2D] = []
 
-func _init(_water: Water, points: PackedVector2Array, _direction: int = -1) -> void:
+func _init(_water: Water, _points: PackedVector2Array, _direction: int = -1) -> void:
+	starting_points = _points
 	water = _water
 	direction = _direction
-	for point in points:
-		add_water_point(point)
+
 
 
 func _ready() -> void:
 	width = water.LINE_WIDTH
 	default_color = Color.BLUE
+	
+	for point in starting_points:
+		add_water_point(point)
 	
 	calculate_points()
 
@@ -36,11 +39,43 @@ func calculate_points():
 		add_water_point(next_point)
 
 
-func calculate_next_point():
-	var tile_set = Game.tile_map.tile_set
-	var x = points[-1].x
-	var y = points[-1].y + (tile_set.tile_size.y / 2.0)
-	return Vector2(x, y)
+## Calculate where the next point in the water line will be.
+##
+## Input:
+## - None
+##
+## Output:
+## - result: Vector2 -> Where the next point will be.
+func calculate_next_point() -> Vector2:
+	assert(not points.is_empty())
+
+	var previous_point = points[-1]
+	assert(previous_point != null)
+	assert(previous_point != Vector2.ZERO)
+
+	var down_point = get_down_point(previous_point)
+	
+	return down_point
+
+## Get the point below the specific point.
+##
+## Input:
+## - point: Vector2 -> The global position of the point we want to look below.
+##
+## Output:
+## - down_point: Vector2 -> The centered, global position of the point below.
+func get_down_point(point: Vector2) -> Vector2:
+	assert(point != Vector2.ZERO)
+	var centered_point = translate_to_cell_center(point)
+	var tile_size_x = Game.tile_map.tile_set.tile_size.x
+	var tile_size_y = Game.tile_map.tile_set.tile_size.y
+	
+	var x = centered_point.x
+	var y = centered_point.y + tile_size_y / 2
+	
+	var down_point = Vector2(x, y)
+	var centered_down_point = translate_to_cell_center(down_point)
+	return centered_down_point
 
 
 ## Add a point to the water line.
@@ -64,8 +99,9 @@ func add_water_point(point: Vector2) -> void:
 ## Output:
 ## - result: bool -> Whether or not the point is inside the viewport.
 func is_inside_viewport(point: Vector2) -> bool:
-	var viewport_rect = get_viewport_rect()
-	assert(viewport_rect)
+	var viewport_rect := get_viewport_rect()
+	assert(viewport_rect != null)
+	assert(viewport_rect.size > Vector2.ZERO)
 	var result = viewport_rect.has_point(point)
 	return result
 
