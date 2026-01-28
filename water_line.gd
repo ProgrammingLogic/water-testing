@@ -27,26 +27,20 @@ func _ready() -> void:
 
 
 func calculate_points():
-	#add_point()
-	#points = [starting_points]
-
 	while true:
-		if is_at_bottom():
+		var next_point = calculate_next_point()
+
+		if not is_inside_viewport(next_point):
 			break
+		
+		add_water_point(next_point)
 
-		if not is_inside_viewport(points[-1]):
-			break
 
-		if can_flow_down():
-			add_point_below()
-
-		#elif can_flow_horizontal():
-			#add_left_point()
-			#break
-			#add_right_point()
-
-		else:
-			break
+func calculate_next_point():
+	var tile_set = Game.tile_map.tile_set
+	var x = points[-1].x
+	var y = points[-1].y + (tile_set.tile_size.y / 2.0)
+	return Vector2(x, y)
 
 
 ## Add a point to the water line.
@@ -56,13 +50,26 @@ func calculate_points():
 ##	line.
 func add_water_point(point: Vector2) -> void:
 	assert(not point == Vector2.ZERO)
-	assert(not is_inside_viewport(point))
+	assert(is_inside_viewport(point))
 	assert(not water.has_point(point))
 	var centered_point = translate_to_cell_center(point)
 	add_point(centered_point)
 
 
-#region Translations -> Methods to translate the WaterLine's points.
+## Check if a point is inside the current viewport.
+##
+## Input:
+## - point: Vector2 -> The global position of the point to chekck
+##
+## Output:
+## - result: bool -> Whether or not the point is inside the viewport.
+func is_inside_viewport(point: Vector2) -> bool:
+	var viewport_rect = get_viewport_rect()
+	assert(viewport_rect)
+	var result = viewport_rect.has_point(point)
+	return result
+
+
 ## Get the point's position translated to the center of the tile map
 ## 
 ## Input:
@@ -122,17 +129,13 @@ func translate_to_global_points(_points: PackedVector2Array) -> PackedVector2Arr
 ## - translated_point: Vector2 -> The point translated to it's local position
 func translate_to_local_point(point: Vector2) -> Vector2:
 	return point - water.position
-#endregion
+
 
 
 #region Checks for the waterline.
 func is_at_bottom() -> bool:
 	var screen_height = get_viewport_rect().size.y
 	return points[-1].y == screen_height
-
-
-func is_inside_viewport(point: Vector2) -> bool:
-	return get_viewport_rect().has_point(point)
 
 
 func can_flow_down() -> bool:
