@@ -1,6 +1,6 @@
 extends Line2D
 class_name WaterLine
-
+## A line of water.
 
 var water: Water = null
 var starting_points: PackedVector2Array = []
@@ -12,13 +12,11 @@ var shape := CollisionShape2D.new()
 var static_body := StaticBody2D.new()
 var segments: Array[SegmentShape2D] = []
 
-
-
-
-func _init(w: Water, s_points: PackedVector2Array, dir: int = -1) -> void:
-	water = w
-	starting_points = s_points
-	direction = dir
+func _init(_water: Water, points: PackedVector2Array, _direction: int = -1) -> void:
+	water = _water
+	direction = _direction
+	for point in points:
+		add_water_point(point)
 
 
 func _ready() -> void:
@@ -29,7 +27,6 @@ func _ready() -> void:
 
 
 func calculate_points():
-	set_points(starting_points)
 	#add_point()
 	#points = [starting_points]
 
@@ -37,7 +34,7 @@ func calculate_points():
 		if is_at_bottom():
 			break
 
-		if is_outside_viewport(points[-1]):
+		if not is_inside_viewport(points[-1]):
 			break
 
 		if can_flow_down():
@@ -59,7 +56,8 @@ func calculate_points():
 ##	line.
 func add_water_point(point: Vector2) -> void:
 	assert(not point == Vector2.ZERO)
-	assert(not is_outside_viewport(point))
+	assert(not is_inside_viewport(point))
+	assert(not water.has_point(point))
 	var centered_point = translate_to_cell_center(point)
 	add_point(centered_point)
 
@@ -75,7 +73,7 @@ func add_water_point(point: Vector2) -> void:
 ##	tile map
 func translate_to_cell_center(point: Vector2) -> Vector2:
 	var tile_map = Game.tile_map
-	var tile_size = tile_map.tile_set.size
+	var tile_size = tile_map.tile_set.tile_size as Vector2
 
 	var cell_cordinates = floor(point / tile_size)
 	var cell_position = cell_cordinates * tile_size
@@ -133,8 +131,8 @@ func is_at_bottom() -> bool:
 	return points[-1].y == screen_height
 
 
-func is_outside_viewport(point: Vector2) -> bool:
-	return not get_viewport_rect().has_point(point)
+func is_inside_viewport(point: Vector2) -> bool:
+	return get_viewport_rect().has_point(point)
 
 
 func can_flow_down() -> bool:
