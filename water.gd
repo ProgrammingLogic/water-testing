@@ -4,8 +4,6 @@ class_name Water
 ##
 ## NOTE: You MUST place Water at (0, 0) of the tile map layer.
 
-const LINE_WIDTH = 8
-
 var water_lines: Array[WaterLine] = []
 var update_timer := Timer.new()
 
@@ -13,6 +11,7 @@ var update_timer := Timer.new()
 
 
 func _ready() -> void:
+	assert(global_position == Vector2.ZERO)
 	update_timer.timeout.connect(update)
 	add_child(update_timer)
 	update_timer.start(2)
