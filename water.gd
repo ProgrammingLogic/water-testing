@@ -58,12 +58,11 @@ func has_point(query_point: Vector2) -> bool:
 			var local_tile_map_point := tile_map.to_local(global_point)
 			var tile_map_cords_point = tile_map.local_to_map(local_tile_map_point)
 
-			print("query:")
-			print("\tglobal_query_point: %v, global_point: %v" % [global_query_point, global_point])
-			print("\ttile_map_cords_query_point: %v, tile_map_cords_point: %v"
-				% [tile_map_cords_query_point, tile_map_cords_point])
-
 			if tile_map_cords_query_point == tile_map_cords_point:
+				print("query:")
+				print("\tglobal_query_point: %v, global_point: %v" % [global_query_point, global_point])
+				print("\ttile_map_cords_query_point: %v, tile_map_cords_point: %v"
+					% [tile_map_cords_query_point, tile_map_cords_point])
 				return true
 
 	return false
@@ -151,7 +150,6 @@ func is_inside_viewport(point: Vector2) -> bool:
 ## - result: bool -> Whether or not the point is colliding with something.
 func is_colliding(point: Vector2) -> bool:
 	var global_point = to_global(point)
-	assert(is_point_valid(global_point))
 
 	var space_state = get_world_2d().direct_space_state
 	assert(space_state != null)

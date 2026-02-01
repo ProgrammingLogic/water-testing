@@ -34,7 +34,7 @@ func _ready() -> void:
 	assert(not _tile_size == Vector2i.ZERO)
 
 	for point in _starting_points:
-		add_water_point(point)
+		add_water_point(point, _flow_direction)
 
 	flow()
 	assert(points.size() > _starting_points.size())
@@ -52,29 +52,65 @@ func flow() -> void:
 	assert(not _starting_points.is_empty())
 	assert(not points.size() > _starting_points.size())
 
-	while true:
-		var next_water_points := get_next_water_points()
-		var is_empty = next_water_points.is_empty()
+	while true: # Keeps iterating until we have no more valid points.
+		var next_points = get_next_points()
 
-		if next_water_points.is_empty():
-			return
+		if next_points.is_empty():
+			break
 
-		var next_point = next_water_points.pop_front()
-		var next_point_direction = next_point["direction"]
-		var next_point_vector = next_point["point"]
-		_flow_direction = next_point_direction
-		add_water_point(next_point_vector)
+		var next_point := find_valid_point(next_points)
 
-		if next_water_points.is_empty():
-			return
+		if next_point.is_empty():
+			break
 
-		while not next_water_points.is_empty():
-			next_point = next_water_points.pop_front()
-			next_point_direction = next_point["direction"]
-			next_point_vector = next_point["point"]
-			_water.add_water_line([next_point_vector], next_point_direction)
+		var point: Vector2 = next_point["point"]
+		var direction: Vector2i = next_point["direction"]
+		add_water_point(point, direction)
 
-	return
+		while not next_points.is_empty():
+			next_point = find_valid_point(next_points)
+
+			if next_point.is_empty():
+				continue
+
+			point = next_point["point"]
+			direction = next_point["direction"]
+			split_water_point(point, direction)
+
+
+## Finds the next valid point in the array of points.
+##
+## As this function iterates through the points, it takes the point out of the
+##	array. This means the array that is passed in will be changed after
+##	executing this function.
+##
+## Input:
+## - next_points: Array[Dictionary] (mutable) -> The points we're trying to
+##		find a valid point in.
+##		Format: [{ point: Vector2, direction: Vector2i }]
+##
+## Output:
+## - next_valid_point: Dictionary -> The next valid point.
+##		Format: { point: Vector2, direction: Vector2i }
+##		If there is NOT a valid next point, returns { }.
+func find_valid_point(next_points: Array[Dictionary]) -> Dictionary:
+	assert(not next_points.is_empty())
+	var next_valid_point: Dictionary = {}
+
+	while not next_points.is_empty():
+		var next_point = next_points.pop_front()
+
+		assert(not next_point.is_empty())
+		var point = next_point["point"]
+		var direction = next_point["direction"]
+
+		if not _water.is_point_valid(point):
+			continue
+
+		next_valid_point = next_point
+		break
+
+	return next_valid_point
 
 
 ## Calculate the next water points and their direction from the current point.
@@ -90,11 +126,8 @@ func flow() -> void:
 ##
 ## Output:
 ## - next_water_points: Array[Dictionary]
-## 		[{
-##			point: Vector2,
-##			direction: Vector2i
-##		}]
-func get_next_water_points() -> Array[Dictionary]:
+##	Format: [{ point: Vector2, direction: Vector2i }]
+func get_next_points() -> Array[Dictionary]:
 	var next_water_points: Array[Dictionary] = []
 
 	assert(not points.is_empty())
@@ -141,6 +174,9 @@ func can_flow_to(point: Vector2) -> bool:
 	if not _water.is_colliding(point):
 		return false
 
+	if _water.has_point(point):
+		return false
+
 	return true
 
 
@@ -154,7 +190,7 @@ func can_flow_to(point: Vector2) -> bool:
 ##
 ## Output:
 ## - None
-func add_water_point(point: Vector2) -> void:
+func add_water_point(point: Vector2, direction: Vector2i) -> void:
 	assert(_water.is_point_valid(point))
 
 	# It's okay if another water line already has our starting points, because
@@ -164,3 +200,15 @@ func add_water_point(point: Vector2) -> void:
 		assert(not _water.has_point(point))
 
 	add_point(point)
+
+
+## Creates another water line in Water, splitting the water line into two parts.
+##
+## Input:
+## - point: Vector2 -> The start of the split water line.
+## - direction: Vector2i -> The direction the split water line is flowing.
+##
+## Output:
+# - None
+func split_water_point(point: Vector2, direction: Vector2i) -> void:
+	_water.add_water_line([point], direction)
