@@ -2,6 +2,12 @@ extends Line2D
 class_name WaterLine
 ## Line representing a water stream in a Water object.
 ##
+## TODO
+## - Make is so when water splits, the starting point of the new line is at the
+##	end of the old line.
+## - Make it so water doesn't split when it reaches the bottom of the screen.
+## - Make it so the water collides with the physics layer 1.
+##
 ## Input:
 ## - water: Water -> The water object this water_line is a part of.
 ## - tile_map: TileMapLayer -> The tilemap this water line is drawn on.
