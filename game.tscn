@@ -69,6 +69,7 @@ tile_set = SubResource("TileSet_boyg6")
 script = ExtResource("8_vef74")
 
 [node name="Water" type="Node2D" parent="AspectRatioContainer" unique_id=1330193213 node_paths=PackedStringArray("tile_map")]
+position = Vector2(224, 40)
 script = ExtResource("8_j5wjh")
 tile_map = NodePath("../TileMapLayer")
 metadata/_custom_type_script = "uid://dpk5xw5nnw43o"
