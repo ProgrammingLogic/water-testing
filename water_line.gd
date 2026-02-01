@@ -177,7 +177,7 @@ func can_flow_to(point: Vector2) -> bool:
 	if not _water.is_point_valid(point):
 		return false
 
-	if not _water.is_colliding(point):
+	if _water.is_colliding(point):
 		return false
 
 	if _water.has_point(point):

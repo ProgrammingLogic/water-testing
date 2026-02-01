@@ -158,4 +158,4 @@ func is_colliding(point: Vector2) -> bool:
 	ray_query_parameters.position = global_point
 
 	var collisions := space_state.intersect_point(ray_query_parameters)
-	return collisions.is_empty()
+	return not collisions.is_empty()
