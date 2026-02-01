@@ -1,43 +1,13 @@
 extends Node2D
 class_name Water
-## Water class
-##
-## NOTE: You MUST place Water at (0, 0) of the tile map layer.
 
-var water_lines: Array[WaterLine] = []
-var update_timer := Timer.new()
 
-@export var starting_point: Node2D
+@export var tile_map: TileMapLayer
+
+
+var _water_lines: Array[WaterLine] = []
 
 
 func _ready() -> void:
-	assert(global_position == Vector2.ZERO)
-	update_timer.timeout.connect(update)
-	add_child(update_timer)
-	update_timer.start(2)
-
-
-func update() -> void:
-	clear_water()
-	add_water_line([starting_point.position], -1)
-
-
-func clear_water() -> void:
-	for water_line in water_lines:
-		water_line.queue_free()
-	
-	water_lines = []
-
-
-func has_point(point: Vector2) -> bool:
-	for water_line in water_lines:
-		if water_line.points.find(point) > -1:
-			return true
-	
-	return false
-
-
-func add_water_line(starting_points: PackedVector2Array, dir: int) -> void:
-	var water_line = WaterLine.new(self, starting_points, dir)
-	water_lines.append(water_line)
-	add_child(water_line)
+	await tile_map.ready
+	_water_lines.append(WaterLine.new(self, tile_map))
