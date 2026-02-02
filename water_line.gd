@@ -3,8 +3,6 @@ class_name WaterLine
 ## Line representing a water stream in a Water object.
 ##
 ## TODO
-## - Make is so when water splits, the starting point of the new line is at the
-##	end of the old line.
 ## - Make it so water doesn't split when it reaches the bottom of the screen.
 ## - Make it so the water collides with the physics layer 1.
 ##
@@ -79,7 +77,7 @@ func flow() -> void:
 			if next_point.is_empty():
 				continue
 
-			point = next_point["point"]
+			point = points[-2] # Start the new line at our previous point.
 			direction = next_point["direction"]
 			split_water_point(point, direction)
 
