@@ -136,7 +136,11 @@ func is_point_valid(point: Vector2) -> bool:
 func is_inside_viewport(point: Vector2) -> bool:
 	var global_point = to_global(point)
 	var viewport_rect = get_viewport_rect()
-	return viewport_rect.has_point(global_point)
+	# We need this so when the water reaches the bottom of the screen, it
+	#	appears to stop at the edge the screen. Without this, our water
+	#	is cut short (and it splits into two at the bottom).
+	var expanded_viewport_rect = viewport_rect.grow(tile_size.x)
+	return expanded_viewport_rect.has_point(global_point)
 
 
 ## Checks whether or not the local point is colliding with something.
