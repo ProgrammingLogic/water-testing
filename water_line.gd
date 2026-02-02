@@ -3,7 +3,6 @@ class_name WaterLine
 ## Line representing a water stream in a Water object.
 ##
 ## TODO
-## - Make it so water doesn't split when it reaches the bottom of the screen.
 ## - Make it so the water collides with the physics layer 1.
 ##
 ## Input:
