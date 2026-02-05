@@ -4,6 +4,7 @@ class_name WaterLine
 ##
 ## TODO
 ## - Whenever we calculate a point, clamp it to the viewport.
+## - Write the render logic for the water line
 ##
 ## Input:
 ## - water: Water -> The water object this water_line is a part of.
