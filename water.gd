@@ -11,10 +11,23 @@ class_name Water
 var tile_size: Vector2
 
 var _water_lines: Array[WaterLine] = []
+var _update_timer: Timer = Timer.new()
 
 
 func _ready() -> void:
+	_update_timer.timeout.connect(_update)
+	_update_timer.wait_time = 1
+	add_child(_update_timer)
+	_update_timer.start()
 	tile_size = tile_map.tile_set.tile_size
+	add_water_line([Vector2.ZERO])
+
+
+func _update() -> void:
+	for water_line in _water_lines:
+		water_line.queue_free()
+
+	_water_lines = []
 	add_water_line([Vector2.ZERO])
 
 
@@ -59,10 +72,6 @@ func has_point(query_point: Vector2) -> bool:
 			var tile_map_cords_point = tile_map.local_to_map(local_tile_map_point)
 
 			if tile_map_cords_query_point == tile_map_cords_point:
-				print("query:")
-				print("\tglobal_query_point: %v, global_point: %v" % [global_query_point, global_point])
-				print("\ttile_map_cords_query_point: %v, tile_map_cords_point: %v"
-					% [tile_map_cords_query_point, tile_map_cords_point])
 				return true
 
 	return false
@@ -139,7 +148,7 @@ func is_inside_viewport(point: Vector2) -> bool:
 	# We need this so when the water reaches the bottom of the screen, it
 	#	appears to stop at the edge the screen. Without this, our water
 	#	is cut short (and it splits into two at the bottom).
-	var expanded_viewport_rect = viewport_rect.grow(tile_size.x)
+	var expanded_viewport_rect = viewport_rect.grow(tile_size.x * 2)
 	return expanded_viewport_rect.has_point(global_point)
 
 

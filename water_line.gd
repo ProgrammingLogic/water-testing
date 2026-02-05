@@ -2,9 +2,6 @@ extends Line2D
 class_name WaterLine
 ## Line representing a water stream in a Water object.
 ##
-## TODO
-## - Make it so the water collides with the physics layer 1.
-##
 ## Input:
 ## - water: Water -> The water object this water_line is a part of.
 ## - tile_map: TileMapLayer -> The tilemap this water line is drawn on.
@@ -40,7 +37,6 @@ func _ready() -> void:
 		add_water_point(point, _flow_direction)
 
 	flow()
-	assert(points.size() > _starting_points.size())
 
 
 ## Calculates the water points for this water line, and then adds them to the
@@ -78,6 +74,7 @@ func flow() -> void:
 
 			point = points[-2] # Start the new line at our previous point.
 			direction = next_point["direction"]
+
 			split_water_point(point, direction)
 
 
