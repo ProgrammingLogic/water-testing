@@ -2,6 +2,9 @@ extends Line2D
 class_name WaterLine
 ## Line representing a water stream in a Water object.
 ##
+## TODO
+## - Whenever we calculate a point, clamp it to the viewport.
+##
 ## Input:
 ## - water: Water -> The water object this water_line is a part of.
 ## - tile_map: TileMapLayer -> The tilemap this water line is drawn on.
