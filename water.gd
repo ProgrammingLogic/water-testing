@@ -172,3 +172,31 @@ func is_colliding(point: Vector2) -> bool:
 
 	var collisions := space_state.intersect_point(ray_query_parameters)
 	return not collisions.is_empty()
+
+
+## Clamps the local point to the viewport bounds.
+##
+## Input:
+## - point: Vector2 -> The point to clamp.
+##
+## Output:
+## - clamped_point: Vector2 -> The point clamped to the viewport bounds.
+func clamp_point_inside_viewport(point: Vector2) -> Vector2:
+	var global_point = to_global(point)
+	var global_clamped_point = global_point
+	var viewport_rect = get_viewport_rect()
+
+	var viewport_rect_x = viewport_rect.position.x
+	var viewport_rect_width = viewport_rect.position.x + viewport_rect.size.x
+	var viewport_rect_y = viewport_rect.position.y
+	var viewport_rect_height = viewport_rect.position.y + viewport_rect.size.y
+
+	global_clamped_point.x = global_point.x if global_point.x > viewport_rect_x else viewport_rect_x
+	global_clamped_point.x = global_point.x if global_point.x < viewport_rect_width else viewport_rect_width
+
+	global_clamped_point.y = global_point.y if global_point.y > viewport_rect_y else viewport_rect_y
+	global_clamped_point.y = global_point.y if global_point.y < viewport_rect_height else viewport_rect_width
+
+	var clamped_point = to_local(global_clamped_point)
+
+	return clamped_point
